@@ -3,6 +3,7 @@ using PDR.PatientBooking.Service.DoctorServices.Requests;
 using PDR.PatientBooking.Service.Validation;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace PDR.PatientBooking.Service.DoctorServices.Validation
 {
@@ -22,6 +23,9 @@ namespace PDR.PatientBooking.Service.DoctorServices.Validation
             if (MissingRequiredFields(request, ref result))
                 return result;
 
+            if (ValidateEmail(request, ref result))
+                return result;
+
             if (DoctorAlreadyInDb(request, ref result))
                 return result;
 
@@ -38,8 +42,28 @@ namespace PDR.PatientBooking.Service.DoctorServices.Validation
             if (string.IsNullOrEmpty(request.LastName))
                 errors.Add("LastName must be populated");
 
+            if (errors.Any())
+            {
+                result.PassedValidation = false;
+                result.Errors.AddRange(errors);
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ValidateEmail(AddDoctorRequest request, ref PdrValidationResult result)
+        {
+            var errors = new List<string>();
+
             if (string.IsNullOrEmpty(request.Email))
                 errors.Add("Email must be populated");
+
+            var regex = new Regex(@"^\S+@\S+$");
+            var match = regex.Match(request.Email ?? string.Empty);
+
+            if (!match.Success)
+                errors.Add("Email must be a valid email address");
 
             if (errors.Any())
             {
