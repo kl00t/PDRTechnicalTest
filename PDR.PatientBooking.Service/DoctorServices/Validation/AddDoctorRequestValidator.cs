@@ -59,10 +59,7 @@ namespace PDR.PatientBooking.Service.DoctorServices.Validation
             if (string.IsNullOrEmpty(request.Email))
                 errors.Add("Email must be populated");
 
-            var regex = new Regex(@"^\S+@\S+$");
-            var match = regex.Match(request.Email ?? string.Empty);
-
-            if (!match.Success)
+            if (!RegexValidation.IsEmailValid(request.Email))
                 errors.Add("Email must be a valid email address");
 
             if (errors.Any())
