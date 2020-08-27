@@ -3,7 +3,6 @@ using PDR.PatientBooking.Service.DoctorServices.Requests;
 using PDR.PatientBooking.Service.Validation;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace PDR.PatientBooking.Service.DoctorServices.Validation
 {

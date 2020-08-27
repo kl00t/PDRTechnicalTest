@@ -4,6 +4,9 @@ using PDR.PatientBooking.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PDR.PatientBooking.Service.BookingService;
+using PDR.PatientBooking.Service.BookingService.Requests;
+using PDR.PatientBookingApi.Extensions;
 
 namespace PDR.PatientBookingApi.Controllers
 {
@@ -11,11 +14,13 @@ namespace PDR.PatientBookingApi.Controllers
     [ApiController]
     public class BookingController : ControllerBase
     {
+        private readonly IBookingService _bookingService;
         private readonly PatientBookingContext _context;
 
-        public BookingController(PatientBookingContext context)
+        public BookingController(PatientBookingContext context, IBookingService bookingService)
         {
             _context = context;
+            _bookingService = bookingService;
         }
 
         [HttpGet("patient/{identificationNumber}/next")]
@@ -45,6 +50,29 @@ namespace PDR.PatientBookingApi.Controllers
                         bookings3.First().EndTime
                     });
                 }
+            }
+        }
+
+        [HttpDelete("cancel/{bookingId}")]
+        public IActionResult Cancel(Guid bookingId)
+        {
+            try
+            {
+                var cancelBooking = new CancelBookingRequest
+                {
+                    Id = bookingId
+                };
+
+                _bookingService.CancelBooking(cancelBooking);
+                return Ok();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
             }
         }
 
