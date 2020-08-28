@@ -79,31 +79,27 @@ namespace PDR.PatientBookingApi.Controllers
         [HttpPost()]
         public IActionResult AddBooking(NewBooking newBooking)
         {
-            var bookingId = new Guid();
-            var bookingStartTime = newBooking.StartTime;
-            var bookingEndTime = newBooking.EndTime;
-            var bookingPatientId = newBooking.PatientId;
-            var bookingPatient = _context.Patient.FirstOrDefault(x => x.Id == newBooking.PatientId);
-            var bookingDoctorId = newBooking.DoctorId;
-            var bookingDoctor = _context.Doctor.FirstOrDefault(x => x.Id == newBooking.DoctorId);
-            var bookingSurgeryType = _context.Patient.FirstOrDefault(x => x.Id == bookingPatientId).Clinic.SurgeryType;
-
-            var myBooking = new Order
+            try
             {
-                Id = bookingId,
-                StartTime = bookingStartTime,
-                EndTime = bookingEndTime,
-                PatientId = bookingPatientId,
-                DoctorId = bookingDoctorId,
-                Patient = bookingPatient,
-                Doctor = bookingDoctor,
-                SurgeryType = (int)bookingSurgeryType
-            };
+                var request = new AddBookingRequest
+                {
+                    StartTime = newBooking.StartTime,
+                    EndTime = newBooking.EndTime,
+                    PatientId = newBooking.PatientId,
+                    DoctorId = newBooking.DoctorId
+                };
 
-            _context.Order.AddRange(new List<Order> { myBooking });
-            _context.SaveChanges();
-
-            return StatusCode(200);
+                _bookingService.AddBooking(request);
+                return Ok();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
         }
 
         public class NewBooking

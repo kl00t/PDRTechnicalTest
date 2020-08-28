@@ -5,5 +5,7 @@ namespace PDR.PatientBooking.Service.BookingService
     public interface IBookingService
     {
         void CancelBooking(CancelBookingRequest cancelBooking);
+
+        void AddBooking(AddBookingRequest addBookingRequest);
     }
 }
