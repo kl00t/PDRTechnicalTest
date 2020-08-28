@@ -11,17 +11,19 @@ namespace PDR.PatientBooking.Service.BookingService
     public class BookingService : IBookingService
     {
         private readonly PatientBookingContext _context;
-        private readonly ICancelBookingRequestValidator _validator;
+        private readonly ICancelBookingRequestValidator _cancelBookingRequestValidator;
+        private readonly IAddBookingRequestValidator _addBookingRequestValidator;
 
-        public BookingService(PatientBookingContext context, ICancelBookingRequestValidator validator)
+        public BookingService(PatientBookingContext context, ICancelBookingRequestValidator cancelBookingRequestValidator, IAddBookingRequestValidator addBookingRequestValidator)
         {
             _context = context;
-            _validator = validator;
+            _cancelBookingRequestValidator = cancelBookingRequestValidator;
+            _addBookingRequestValidator = addBookingRequestValidator;
         }
 
         public void CancelBooking(CancelBookingRequest cancelBookingRequest)
         {
-            var validationResult = _validator.ValidateRequest(cancelBookingRequest);
+            var validationResult = _cancelBookingRequestValidator.ValidateRequest(cancelBookingRequest);
 
             if (!validationResult.PassedValidation)
             {
@@ -35,13 +37,12 @@ namespace PDR.PatientBooking.Service.BookingService
 
         public void AddBooking(AddBookingRequest addBookingRequest)
         {
-            // TODO: Add Validation
-            //var validationResult = _validator.ValidateRequest(addBookingRequest);
+            var validationResult = _addBookingRequestValidator.ValidateRequest(addBookingRequest);
 
-            //if (!validationResult.PassedValidation)
-            //{
-            //    throw new ArgumentException(validationResult.Errors.First());
-            //}
+            if (!validationResult.PassedValidation)
+            {
+                throw new ArgumentException(validationResult.Errors.First());
+            }
 
             var bookingId = new Guid();
             var bookingStartTime = addBookingRequest.StartTime;

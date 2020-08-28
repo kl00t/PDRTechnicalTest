@@ -20,6 +20,7 @@ namespace PDR.PatientBooking.Service.Tests.BookingService
         private IFixture _fixture;
         private PatientBookingContext _context;
         private Mock<ICancelBookingRequestValidator> _validator;
+        private Mock<IAddBookingRequestValidator> _addBookingRequestValidator;
         private Service.BookingService.BookingService _bookingService;
 
         [SetUp]
@@ -35,12 +36,13 @@ namespace PDR.PatientBooking.Service.Tests.BookingService
             // Mock setup
             _context = new PatientBookingContext(new DbContextOptionsBuilder<PatientBookingContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             _validator = _mockRepository.Create<ICancelBookingRequestValidator>();
+            _addBookingRequestValidator = _mockRepository.Create<IAddBookingRequestValidator>();
 
             // Mock default
             SetupMockDefaults();
 
             // Sut instantiation
-            _bookingService = new Service.BookingService.BookingService(_context, _validator.Object);
+            _bookingService = new Service.BookingService.BookingService(_context, _validator.Object, _addBookingRequestValidator.Object);
         }
 
         private void SetupMockDefaults()
