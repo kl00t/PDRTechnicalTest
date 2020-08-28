@@ -64,8 +64,11 @@ namespace PDR.PatientBooking.Service.Tests.BookingService.Validation
             var request = _fixture.Create<AddBookingRequest>();
             request.DoctorId = 1;
             request.PatientId = 1;
-            request.StartTime = new DateTime().AddDays(1);
-            request.EndTime = new DateTime().AddDays(1);
+
+            var startTime = DateTime.UtcNow.AddDays(-1);
+            var endTime = startTime.AddHours(1);
+            request.StartTime = startTime;
+            request.EndTime = endTime;
 
             //act
             var res = _addBookingRequestValidator.ValidateRequest(request);
@@ -73,6 +76,26 @@ namespace PDR.PatientBooking.Service.Tests.BookingService.Validation
             //assert
             res.PassedValidation.Should().BeFalse();
             res.Errors.Should().Contain("Booking cannot be in the past");
+        }
+
+        [Test]
+        public void ValidateRequest_BookingIsInFuture_ReturnsPassedValidationResult()
+        {
+            //arrange
+            var request = _fixture.Create<AddBookingRequest>();
+            request.DoctorId = 1;
+            request.PatientId = 1;
+
+            var startTime = DateTime.UtcNow.AddDays(1);
+            var endTime = startTime.AddHours(1);
+            request.StartTime = startTime;
+            request.EndTime = endTime;
+
+            //act
+            var res = _addBookingRequestValidator.ValidateRequest(request);
+
+            //assert
+            res.PassedValidation.Should().BeTrue();
         }
 
         private AddBookingRequest GetValidRequest()
