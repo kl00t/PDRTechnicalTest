@@ -6,7 +6,6 @@ using NUnit.Framework;
 using PDR.PatientBooking.Data;
 using PDR.PatientBooking.Service.BookingService.Requests;
 using PDR.PatientBooking.Service.BookingService.Validation;
-using PDR.PatientBooking.Service.ClinicServices.Requests;
 
 namespace PDR.PatientBooking.Service.Tests.BookingService.Validation
 {
@@ -82,14 +81,19 @@ namespace PDR.PatientBooking.Service.Tests.BookingService.Validation
         public void ValidateRequest_BookingIsInFuture_ReturnsPassedValidationResult()
         {
             //arrange
-            var request = _fixture.Create<AddBookingRequest>();
-            request.DoctorId = 1;
-            request.PatientId = 1;
+            var request = GetValidRequest();
 
-            var startTime = DateTime.UtcNow.AddDays(1);
-            var endTime = startTime.AddHours(1);
-            request.StartTime = startTime;
-            request.EndTime = endTime;
+            //act
+            var res = _addBookingRequestValidator.ValidateRequest(request);
+
+            //assert
+            res.PassedValidation.Should().BeTrue();
+        }
+
+        [Test]
+        public void ValidateRequest_IsBookingAvailable_ReturnsPassedValidationResult()
+        {
+            var request = GetValidRequest();
 
             //act
             var res = _addBookingRequestValidator.ValidateRequest(request);
@@ -102,7 +106,7 @@ namespace PDR.PatientBooking.Service.Tests.BookingService.Validation
         {
             var request = _fixture.Create<AddBookingRequest>();
             request.DoctorId = 1;
-            request.PatientId = 1;
+            request.PatientId = 100;
             request.StartTime = DateTime.UtcNow.AddDays(1);
             request.EndTime = DateTime.UtcNow.AddDays(1);
             return request;
